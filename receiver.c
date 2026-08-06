@@ -29,12 +29,7 @@ int main()
     // Message to send
     char msg[] = "Hello Server!!";
 
-    ssize_t a = sendto(ret,
-                       msg,
-                       strlen(msg),
-                       0,
-                       (const struct sockaddr *)&server_addr,
-                       sizeof(server_addr));
+    ssize_t a = sendto(ret, msg, strlen(msg), 0, (const struct sockaddr *)&server_addr, sizeof(server_addr));
 
     if(a == -1)
     {
@@ -48,12 +43,7 @@ int main()
     // Receive reply
     char buff[1000];
     socklen_t server_len = sizeof(server_addr);
-    ssize_t b = recvfrom(ret,
-                         buff,
-                         sizeof(buff),
-                         0,
-                         (struct sockaddr *)&server_addr,
-                         &server_len);
+    ssize_t b = recvfrom(ret, buff, sizeof(buff), 0, (struct sockaddr *)&server_addr, &server_len);
 
     if(b == -1)
     {
