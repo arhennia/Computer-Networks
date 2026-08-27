@@ -20,8 +20,8 @@ int main()
     struct sockaddr_in server_sock;
     memset(&server_sock, 0, sizeof(server_sock));
     server_sock.sin_family = AF_INET;
-    server_sock.sin_port = htons(5000);
-    server_sock.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server_sock.sin_port = htons(5000); 
+    server_sock.sin_addr.s_addr = inet_addr("127.0.0.1"); //server ka ip dalna
 
     int status_connect = connect(ret, (const struct sockaddr *)&server_sock, sizeof(server_sock));
     if(status_connect == -1){
