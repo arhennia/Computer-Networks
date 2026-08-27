@@ -21,7 +21,8 @@ int main()
     memset(&my_sock, 0, sizeof(my_sock));
     my_sock.sin_family = AF_INET;
     my_sock.sin_port = htons(5000);
-    my_sock.sin_addr.s_addr = htonl(INADDR_ANY);
+    // my_sock.sin_addr.s_addr = htonl(INADDR_ANY);
+    inet_aton("100.81.134.57", &my_sock.sin_addr); //translation shit
 
     // bind
     int status = bind(ret, (const struct sockaddr *)&my_sock, sizeof(my_sock));
