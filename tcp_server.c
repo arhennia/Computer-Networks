@@ -1,77 +1,84 @@
 #include <stdio.h>          
 #include <stdlib.h>        
-#include <unistd.h>         
+#include <unistd.h>        
 #include <sys/socket.h>     
 #include <netinet/in.h>     
-#include <string.h>         
+#include <string.h>        
 #include <arpa/inet.h>      
-
 
 int main()
 {
-    //udp socket
     int ret = socket(AF_INET, SOCK_STREAM, 0);
     if(ret == -1)
     {
-        printf("Socket creation failed!!\n");
+        perror("Socket creation failed");
         exit(-1);
     }
     printf("Socket created successfully\n");
 
     struct sockaddr_in my_sock;
-    memset(&my_sock,0,sizeof(my_sock));
+    memset(&my_sock, 0, sizeof(my_sock));
     my_sock.sin_family = AF_INET;
     my_sock.sin_port = htons(5000);
     my_sock.sin_addr.s_addr = htonl(INADDR_ANY);
 
-
-    //bind
     int status = bind(ret, (const struct sockaddr *)&my_sock, sizeof(my_sock));
-    if(status==-1){
-        printf("Bind Failed!!\n");
-    }
-    else{
+    if(status == -1){
+        perror("Bind Failed");
+        close(ret);
+        exit(-1);
+    } else {
         printf("Bind Successful!!\n");
     }
 
-    //listen
     int status_listen = listen(ret, 5);
     if(status_listen == -1){
-        printf("Listen Failed!!\n");
-    }else{
+        perror("Listen Failed");
+        close(ret);
+        exit(-1);
+    } else {
         printf("Listen Successful!!\n");
     }
+    
+    while(1){
+        struct sockaddr_in client_sock;
+        socklen_t clientsock_len = sizeof(client_sock); 
+        int status_accept = accept(ret, (struct sockaddr *)&client_sock, &clientsock_len);
+        if(status_accept == -1){
+            perror("Accept Failed");
+            continue;
+        } else {
+            printf("Client connected: %s:%d\n", 
+                   inet_ntoa(client_sock.sin_addr), 
+                   ntohs(client_sock.sin_port));
+        }
 
-    //accept
-    struct sockaddr_in client_sock;
-    int clientsock_len = sizeof(client_sock);
-    int status_accept = accept(ret, (struct sockaddr *)&client_sock, &clientsock_len);
-    if(status_accept == -1){
-        printf("Accept Failed!!\n");
-        exit(-1);
-    }else{
-        printf("Accept Successful!!\n");
-    }
+        while(1){
+            char buff[1000];
+            ssize_t a = recv(status_accept, buff, sizeof(buff) - 1, 0);
+            
+            if(a < 0){
+                perror("Receive Failed");
+                break; 
+            } else if (a == 0) {
+                printf("Client disconnected.\n");
+                break; // Exit inner loop on clean close
+            } else {
+                buff[a] = '\0';
+                printf("Received : %s\n", buff);
+            }
 
-
-    //recv
-    char buff[1000];
-    ssize_t a = recv(status_accept, buff, sizeof(buff), 0);
-    // printf("Port number of sender: %d\n",ntohs(client_addr.sin_port));
-    if(a==-1){
-        printf("Receive Failed!!\n"); exit(-1);
-    } else{
-        buff[a]='\0';
-        printf("Received : %s\n",buff);
-    }
-
-    //send
-    char msg[]="hello!!";
-    ssize_t b = send(ret, msg, strlen(msg), 0);
-    if(b==-1){
-        printf("Send Failed!!\n"); exit(-1);
-    } else {
-        printf("Reply Sent\n");
+            char msg[] = "hello!!";
+            ssize_t b = send(status_accept, msg, strlen(msg), 0);
+            if(b == -1){
+                perror("Send Failed");
+                break;
+            } else {
+                printf("Reply Sent\n");
+            }
+        }
+ 
+        close(status_accept); 
     }
 
     close(ret);
