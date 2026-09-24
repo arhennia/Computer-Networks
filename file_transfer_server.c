@@ -5,7 +5,6 @@
 #include <netinet/in.h>     
 #include <string.h>        
 #include <arpa/inet.h>      
-
 int main()
 {
     // socket
@@ -22,9 +21,6 @@ int main()
     my_sock.sin_family = AF_INET;
     my_sock.sin_port = htons(5000);
     my_sock.sin_addr.s_addr = htonl(INADDR_ANY);
-    // inet_aton("100.81.134.57", &my_sock.sin_addr); //translation shit
-
-    // bind
     int status = bind(ret, (const struct sockaddr *)&my_sock, sizeof(my_sock));
     if(status == -1){
         printf("Bind Failed!!\n");
@@ -32,7 +28,6 @@ int main()
     } else {
         printf("Bind Successful!!\n");
     }
-
     // listen
     int status_listen = listen(ret, 5);
     if(status_listen == -1){
