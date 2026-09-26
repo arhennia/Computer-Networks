@@ -2,7 +2,7 @@
 
 int main() {
     int num = 258;
-
+    //some random bs our prof pulls off and i hate it
     int byte1 = num & 255;
     int byte2 = (num >> 8) & 255;
     int byte3 = (num >> 16) & 255;
